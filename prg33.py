@@ -38,3 +38,7 @@ final.insert(3,temp)
 
 print(final.index('колбаса'))
 print(final)
+
+s='Собака'
+
+n=s.replace('а', 'о', 1)
