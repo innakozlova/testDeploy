@@ -12,7 +12,7 @@ def summ(a,b):
     else:
         return res
 
-print(summ(first,second))
+
 
 def sub(a, b):
     """
@@ -29,7 +29,7 @@ def sub(a, b):
     else:
         return res
 
-print(sub(first, second))
+
 
 def multi(a, b):
     """
@@ -46,7 +46,6 @@ def multi(a, b):
     else:
         return res
 
-print(multi(first, second))
 
 def divide(a, b):
     """
@@ -65,4 +64,6 @@ def divide(a, b):
     else:
         return res
 
-print(divide(first, second))
+#if __name__ == '__main__':
+    print('не запускай меня', Это библиотека функции)
+
