@@ -29,3 +29,4 @@ print(sq)
 fruits=['Арбуз', 'Ананас','Банан', 'Яблоко', 'Манго']
 fruits.sort(key= lambda letter: letter[-1])
 print(fruits)
+
