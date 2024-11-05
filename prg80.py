@@ -65,7 +65,7 @@ db=DbWrite('films_db.sqlite')
 sql="""update genres set title='Научная фантастика' where id=25
 """
 
-result=db.data_delete(sql)
+result=db.data_update(sql)
 
 #for item in result:
  #   print(item)
