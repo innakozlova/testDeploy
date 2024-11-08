@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route('/index')
 def index():
     param={}
-   # param['content']='Этот текст отобразится на главной странице'
+    param['text']='Этот текст отобразится на главной странице'
     param['title']='Главная'
     return render_template('index.html', **param)
   #  return render_template('index.html', title='Главная', content=content)
@@ -17,12 +17,17 @@ def index():
     # | <a href ="/img/2">Картинка 2</a>
     #"""
 #    'Привет, я приложение  Flask!'
-@app.route('/news')
-def news():
-    with open("news.json", "rt", encoding="utf-8") as f:
-        news_list = json.loads(f.read())
-    print(news_list)
-    return render_template('news.html', news=news_list, title='Новости')
+@app.route('/pets')
+def pets():
+    with open("pets.json", "rt", encoding="utf-8") as f:
+        pets_list = json.load(f)
+    print(pets_list)
+    return render_template('pets.html', pets=pets_list, title='Питомцы')
+
+@app.route('/quere')
+def quere():
+    return render_template('quere.html', title='Очередь')
+
 @app.route('/odd_even/', defaults={'num':0})
 @app.route('/odd_even/<int:num>')
 def odd_even(num):
@@ -38,8 +43,11 @@ def countdown():
 
 @app.route('/contacts')
 def contacts():
-    return""" <b>E-mail: </b> inkys@yandex.ru<br> 
-    <a href ='/'> Контакты в Санкт-Петербурге </a>"""
+    return render_template('contacts.html', title='Наши контакты')
+
+@app.route('/aboutus')
+def aboutus():
+    return render_template('aboutus.html', title='О нас')
 
 #Статический контент в папке static
 # Все изображения static/images
