@@ -1,6 +1,7 @@
-from flask import Flask, url_for, request, render_template, redirect
+from flask import Flask, url_for, request, render_template
+from flask import redirect, flash
 from loginform import LoginForm
-
+from werkzeug.utils import secure_filename
 import json, os
 
 current_directory=os.path.dirname(__file__)
@@ -10,7 +11,7 @@ ALLOWED_EXTENTIONS={'txt','pdf','png','jpg','jpeg','gif'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'too_short_key'
-app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENTIONS
@@ -28,6 +29,14 @@ def index():
     # | <a href ="/img/2">Картинка 2</a>
     #"""
 #    'Привет, я приложение  Flask!'
+
+app.route('/weather', methods=['GET', 'POST'])
+def weather():
+    if request.method == 'GET':
+        return render_template('weather.html', title='Заполните город', form='None') #форма с городом
+    elif request.method == 'POST':
+        return render_template('weather.html', title='Погода в городе', form=request.form) #обращение к API openweathermap
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -49,8 +58,19 @@ def upload_file():
     if request.method =='GET':
         return render_template('upload.html', title='Выбор файла', form=None)
     elif request.method =='POST':
-        pass
-
+        if 'file' not in request.files:
+            flash('Файл не был найден')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename=='':
+            flash('Файл не был отправлен')
+            return redirect(request.url)
+        if not allowed_file(file.filename):
+            flash('Загрузка файлов данного типа запрещена')
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return render_template('upload.html', title='Файл загружен', form=True)
 @app.route('/quere')
 def quere():
     return render_template('quere.html', title='Очередь')
