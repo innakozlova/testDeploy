@@ -1,0 +1,48 @@
+html,
+body,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  background-color: #aaffee;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10 px;
+  font: 100%, Helvetica, sans-serif;
+  color: #ff44cc;
+}
+
+section {
+  font: 50%, Helvetica, sans-serif;
+  color: #aaeebb;
+}
+
+#p {
+  color: black;
+}
+#p a {
+  font-weight: bold;
+}
+#p a:hover {
+  color: #ff44cc;
+}
+#p a:visited {
+  color: #aaeebb;
+}
+
+ul {
+  color: #ff44cc;
+}
+ul li {
+  font-family: black;
+}
+ul a {
+  display: inline-block;
+}
+ul a:a {
+  color: #aaeebb;
+}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if not form %}
+<h1>Погода в городе</h1>
+<form class="weather_form" method="post">
+    <input class="form-control" type="name" name="city" id="city" placeholder="Введите город">
+        <button type="submit" class="btn btn-primary">Узнать погоду</button>
+</form>
+{% else %}
+<h1>Погода:</h1>
+<p><b>Температура:</b>: {{ temp['temp'] }}</p>
+<p><b>Давление:</b>: {{ temp['pressure'] }}</p>
+<p><b>Влажность:</b> {{ temp['humidity'] }}</p>
+{% endif %}
+{% endblock %}
+
+{% block footer %}
+<!--подвал-->
+<br>
+<footer class="bg-body-tertiary text-center text-lg-start">
+    <!-- Copyright -->
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+        © 2024 С нами по свету
+    </div>
+    <!-- Copyright -->
+</footer>
+<!--подвал end-->
+{% endblock %}

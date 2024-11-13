@@ -1,21 +1,22 @@
 import configparser
 import requests
 
-config=configparser.ConfigParser() #объект для обращения к ini
-#читаем
+config = configparser.ConfigParser()  # объект для обращения к ini
+# читаем
 config.read('settings.ini')
 
 key = config['Weather']['key']
 
-res=requests.get('http://api.openweathermap.org/data/2.5/find', params={'q': 'Санкт-Петербург', 'type': 'like',
-                                                                        'units':'metric', 'APPID': key})
+res = requests.get('http://api.openweathermap.org/data/2.5/find', params={'q': 'Санкт-Петербург', 'type': 'like', 'units': 'metric', 'APPID': key})
 
-data=res.json()
+data = res.json()
+print(data)
 
-temp=data['list'][0]['main']
-print('Температура:', temp['temp'])
-print('Давление:', temp['pressure'])
-print('Влажность:', temp['humidity'])
+# temp = data['list'][0]['main']
+#
+# print(f'Температура:', temp['temp'])
+# print(f'Давление:', temp['pressure'])
+# print(f'Влажность:', temp['humidity'])
 
 """
 {'message': 'like', 'cod': '200', 'count': 2, 'list': [{'id': 498817, 'name': 'Saint Petersburg', 'coord': {'lat': 59.8944, 'lon': 30.2642}, 

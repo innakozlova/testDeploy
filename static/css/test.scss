@@ -1,0 +1,52 @@
+$font-stack: Helvetica, sans-serif;
+$primary-color:#ff44cc;
+$secondary-color: #aaeebb;
+$dark-color: black;
+
+@import'reset';
+
+@mixin flexible($value) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: $value(px);
+}
+
+body {
+    @include flexible(10);
+    font: 100%, $font-stack;
+    color: $primary-color;
+}
+
+section {
+    font: 50%, $font-stack;
+    color: $secondary-color;
+}
+
+
+#p{
+    color: $dark-color;
+    a{
+      font-weight: bold;
+        &:hover{
+            color:$primary-color;
+        }
+        &:visited {
+            color: $secondary-color;
+        }
+    }
+}
+
+ul {
+    color: $primary-color;
+    li{
+        font-family:$dark-color;
+        
+    }
+    a{
+        display: inline-block;
+        &:a{
+            color: $secondary-color;
+        }
+    }
+}

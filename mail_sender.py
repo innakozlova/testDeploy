@@ -57,8 +57,8 @@ def mail_task():
     send_mail('mail_list[count]', 'проверка', message)
     count+=1
 
-while count<len(mail_list):
-    schedule.every(2).seconds.do(mail_task)
-    time.sleep(1)
+#while count<len(mail_list):
+#    schedule.every(2).seconds.do(mail_task)
+#    time.sleep(1)
 
 print('Рассылка завершена')

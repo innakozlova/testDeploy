@@ -1,0 +1,17 @@
+settings.json в VScode
+{
+    "files.autoSave": "afterDelay",
+    "liveSassCompile.settings.formats": [
+        {
+            "format": "expanded",
+            "extensionName": ".css",
+            "savePath": null
+        },
+        {
+            "format": "compressed",
+            "extensionName": ".min.css",
+            "savePath": null
+        }
+    ],
+    "liveSassCompile.settings.generateMap": false
+}

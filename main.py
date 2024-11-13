@@ -1,8 +1,12 @@
 from flask import Flask, url_for, request, render_template
 from flask import redirect, flash
+#from mail_sender import send_mail
 from loginform import LoginForm
+from mailform import MailForm
 from werkzeug.utils import secure_filename
 import json, os
+import configparser
+import requests
 
 current_directory=os.path.dirname(__file__)
 UPLOAD_FOLDER=f'{current_directory}/static/uploads'
@@ -12,6 +16,9 @@ ALLOWED_EXTENTIONS={'txt','pdf','png','jpg','jpeg','gif'}
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'too_short_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+config = configparser.ConfigParser()  # объект для обращения к ini
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENTIONS
@@ -30,12 +37,31 @@ def index():
     #"""
 #    'Привет, я приложение  Flask!'
 
-app.route('/weather', methods=['GET', 'POST'])
+@app.route('/weather', methods=['GET', 'POST'])
 def weather():
     if request.method == 'GET':
-        return render_template('weather.html', title='Заполните город', form='None') #форма с городом
+        return render_template('weather.html', title='Погода', form=None) #форма с городом
     elif request.method == 'POST':
-        return render_template('weather.html', title='Погода в городе', form=request.form) #обращение к API openweathermap
+        config.read('settings.ini')
+        #return render_template('weather.html', title='Погода в городе', form=request.form) #обращение к API openweathermap
+        city= request.form['city']
+        if len(city) <2:
+            flash('Город введен не полностью')
+            return redirect(request.url)
+        key = config['Weather']['key']
+
+        res = requests.get('http://api.openweathermap.org/data/2.5/find',
+                           params={'q': city, 'type': 'like', 'units': 'metric', 'APPID': key})
+
+        data = res.json()
+
+        temp = data['list'][0]['main']
+        params = {}
+        params['temper'] = temp['temp']
+        params['press'] = temp['pressure']
+        params['humid'] = temp['humidity']
+
+        return render_template('weather.html', title=f'Погода в {city}', form=request.form, params=params)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -88,10 +114,13 @@ def countdown():
     cl.append('Финищ')
     return '<br>'.join(cl)
 
-@app.route('/contacts')
-def contacts():
-    return render_template('contacts.html', title='Наши контакты')
 
+@app.route('/contacts', methods=['GET', 'POST'])
+def contacts():
+    form = MailForm()
+    if form.validate_on_submit():
+        return redirect('/success')
+    return render_template('contacts.html', title='Наши контакты', form=form)
 @app.route('/aboutus')
 def aboutus():
     return render_template('aboutus.html', title='О нас')
