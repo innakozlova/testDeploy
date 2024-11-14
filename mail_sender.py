@@ -42,23 +42,25 @@ def send_mail(email, subject, text):
     server.quit()
     return True
 
+#if __name__ == '__main__':
 
-message = """ 
-Это проверка отправки почты 
-моим скриптом
-"""
-send_mail('pochtovy@rambler.ru', 'проверка', message)
 
-mail_list =['pochtovy@rambler.ru', 'b@c.ru']
-count=0 # глобальный счетчик писем
-
-def mail_task():
-    global count
-    send_mail('mail_list[count]', 'проверка', message)
-    count+=1
-
-#while count<len(mail_list):
-#    schedule.every(2).seconds.do(mail_task)
-#    time.sleep(1)
-
-print('Рассылка завершена')
+    # message = """
+    # Это проверка отправки почты
+    # моим скриптом
+    # """
+    # send_mail('pochtovy@rambler.ru', 'проверка', message)
+    #
+    # mail_list =['pochtovy@rambler.ru', 'b@c.ru']
+    # count=0 # глобальный счетчик писем
+    #
+    # def mail_task():
+    #     global count
+    #     send_mail('mail_list[count]', 'проверка', message)
+    #     count+=1
+    #
+    # #while count<len(mail_list):
+    # #    schedule.every(2).seconds.do(mail_task)
+    # #    time.sleep(1)
+    #
+    # print('Рассылка завершена')

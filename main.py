@@ -1,6 +1,6 @@
 from flask import Flask, url_for, request, render_template
 from flask import redirect, flash
-#from mail_sender import send_mail
+from mail_sender import send_mail
 from loginform import LoginForm
 from mailform import MailForm
 from werkzeug.utils import secure_filename
@@ -73,6 +73,7 @@ def login():
 @app.route('/success')
 def success():
     return 'Успех'
+
 @app.route('/pets')
 def pets():
     with open("pets.json", "rt", encoding="utf-8") as f:
@@ -118,8 +119,40 @@ def countdown():
 @app.route('/contacts', methods=['GET', 'POST'])
 def contacts():
     form = MailForm()
+    params={}
     if form.validate_on_submit():
-        return redirect('/success')
+        name = form.username.data
+        params['name'] = name
+        phone = form.phone.data
+        params['phone'] = phone
+        email = form.email.data
+        params['email'] = email
+        message = form.message.data
+        params['message'] = message
+        params['page'] = request.url
+
+        text=f""" Пользователь {name} оставил Вам сообщение:
+        {message}.
+        Его телефон {phone},
+        Email: {email},
+       # Страница:{request.url}.
+        """
+
+        text_to_user = f""" 
+        Уважаемая {name} !
+                Ваши данные:
+                Его телефон {phone},
+                Email: {email},
+                успешно по получены.
+                Ваше сообщение: {message} принято к рассмотрению.
+                Страница:{request.url}.
+        """
+        send_mail('pochtovy@rambler.ru', 'Запрос сайта', text_to_user)
+        send_mail('inkys@yandex.ru', 'Запрос сайта', text)
+
+
+        return render_template('mailresult.html', title='Ваши данные', params=params)
+
     return render_template('contacts.html', title='Наши контакты', form=form)
 @app.route('/aboutus')
 def aboutus():
