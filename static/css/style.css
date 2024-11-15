@@ -46,3 +46,30 @@ form.mail-form{
     border-radius: 5px;
     padding: 15px;
 }
+/* стилизуем кнопку*/
+.go-top {
+    position: fixed; /* фиксированная позиция*/
+    right: 20px; /* регулировка*/
+    bottom: 50px; /* положения*/
+    cursor: pointer;
+    font-size: 18px;
+    color: rgba(0,51,153,0.8);
+    border: 1px solid rgba(0,51,153,0.3);
+    border-radius: 50%;
+    background-color: rgba(0,51,153,0.4);
+    padding: 8px 15px 12px 15px;
+    z-index: 1000; /* над всеми элементами*/
+    display: none; /* изначально кнопку не видно*/
+}
+
+/* поведение при наведении мыши*/
+.go-top:hover {
+    color: rgba (0,51,153,0.95);
+    border: 1px solid rgba(255,0,153,0.75);
+    background-color: rgba(100,51,153,0.85);
+}
+
+/* модификатор для отображения*/
+.go-top--show {
+    display: block;
+}
