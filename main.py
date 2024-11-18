@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask, url_for, request, render_template
 from flask import redirect, flash
 from mail_sender import send_mail
@@ -5,6 +7,9 @@ from loginform import LoginForm
 from mailform import MailForm
 from werkzeug.utils import secure_filename
 import json, os
+from data import db_session
+from data.users import User
+from data.news import News
 import configparser
 import requests
 
@@ -219,6 +224,45 @@ def form_sample():
        # print(request.form['password'])
        # print(request.form['profession'])
        # return 'Форма успешно отправлена'
+#
 
 if __name__ == '__main__':
-    app.run(port=5000, host='127.0.0.1')
+    db_session.global_init('db/blogs.db')
+    db_sess = db_session.create_session()
+#News create
+    #news = News(title="Первая новость", content="Первая новость", user_id = 1, is_private = False)
+    #db_sess.add(news)
+    #db_sess.commit()
+
+#Read news
+    news=db_sess.query(News).filter(News.user_id==1).first()
+    print(news.title, news.content)
+    #Read user
+   # result = db_sess.query(User).first() только первая запись из запроса
+   # result = db_sess.query(User).all()
+   # result = db_sess.query(User).filter(User.id>1, User.about.like ("%четвертая%"))
+   # for user in result:
+    # print(user.name, user.email)
+
+    #Update user
+   # result = db_sess.query(User).filter(User.id==4).first()
+  #  result.name='User22'
+   # result.created_date=datetime.datetime.now()
+  #  db_sess.commit()
+   # print(result.email)
+
+    #Create user
+   # user=User()
+  #  user.name='User4'
+  #  user.about='четвертый пользователь нашей БД'
+  #  user.email='email4@email.ru'
+  #  db_sess= db_session.create_session()
+   # db_sess.add(user)
+   # db_sess.commit()
+
+    #Delete user
+   # db_sess.query(User).filter(User.id > 1).delete()
+   # db_sess.query(User).filter(User.id==2).delete()
+   # db_sess.commit()
+
+#   app.run(port=5000, host='127.0.0.1')
