@@ -1,5 +1,5 @@
 from flask import Flask, url_for, request, render_template, redirect
-from loginform import LoginForm
+from forms.loginform import LoginForm
 import json
 
 app = Flask(__name__)

@@ -1,17 +1,19 @@
 import datetime
-
-from flask import Flask, url_for, request, render_template
+import configparser
+from flask import Flask, url_for, request, render_template, make_response, session
 from flask import redirect, flash
+from flask_login import LoginManager, login_user
 from mail_sender import send_mail
-from loginform import LoginForm
+from forms.loginform import LoginForm
 from mailform import MailForm
 from werkzeug.utils import secure_filename
 import json, os
 from data import db_session
 from data.users import User
 from data.news import News
-import configparser
+
 import requests
+from forms.user import RegisterForm
 
 current_directory=os.path.dirname(__file__)
 UPLOAD_FOLDER=f'{current_directory}/static/uploads'
@@ -19,8 +21,12 @@ ALLOWED_EXTENTIONS={'txt','pdf','png','jpg','jpeg','gif'}
 
 
 app = Flask(__name__)
+login_manager=LoginManager()
+login_manager.init_app(app) #привязали менеджер авторизации к приложению
+
 app.config['SECRET_KEY'] = 'too_short_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['PERMANENT_SESSION_LIFETIME']=datetime.timedelta(days=365)
 
 config = configparser.ConfigParser()  # объект для обращения к ini
 
@@ -41,6 +47,30 @@ def index():
     # | <a href ="/img/2">Картинка 2</a>
     #"""
 #    'Привет, я приложение  Flask!'
+
+@login_manager.user_loader
+def user_loader(user_id):
+    db_sess=db_session.create_session()
+    return db_sess.query(User).get(user_id)
+
+@app.route('/session_test')
+def session_test():
+    visit_count=session.get('visit_count', 0)
+    session['visit_count']=visit_count+1
+    #session.pop('visit_count', None) # если надо программно уничтожить сессию
+    return make_response(f'Вы посетили данную страницу {visit_count} раз')
+
+@app.route('/cookie_test')
+def cookie_test():
+    visit_count=int(request.cookies.get('visit_count',0))
+    if visit_count:
+        res=make_response(f'Вы посетили данную страницу {visit_count +1} раз')
+        res.set_cookie('visit_count', str(visit_count+1), max_age=60*60*24*365*2)
+    else:
+        res=make_response('За последние 2 года вы посетили данную страницу впервые.')
+        res.set_cookie('visit_count','1', max_age=60*60*24*365*2)
+       # res.set_cookie('visit_count', '1', max_age=0) удаляем cookies
+    return res
 
 @app.route('/weather', methods=['GET', 'POST'])
 def weather():
@@ -68,11 +98,38 @@ def weather():
 
         return render_template('weather.html', title=f'Погода в {city}', form=request.form, params=params)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if form.password.data !=form.password_again.data:
+            return render_template('register.html', title='Регистрация', form=form, message='Пароли не совпадают')
+        db_sess= db_session.create_session()
+        if db_sess.query(User).filter(User.email==form.email.data).first():
+            return render_template('register.html', title='Регистрация', form=form, message=f'Пользователь с Email {form.email.data} уже зарегистрирован')
+        user = User(
+            name=form.name.data,
+            email=form.email.data,
+            about=form.about.data
+        )
+        user.set_password(form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        return redirect('/login')
+    return render_template('register.html', title='Регистрация', form=form)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        return redirect('/success')
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect('/')  # request.url либо на нужную страницу
+        return render_template('login.html', title='Ошибка авторизации', message='Неправильная пара: логин-пароль!',
+                               form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 @app.route('/success')
@@ -163,6 +220,13 @@ def contacts():
 def aboutus():
     return render_template('aboutus.html', title='О нас')
 
+
+@app.route('/blog')
+def blog():
+    db_sess = db_session.create_session()
+    news = db_sess.query(News).filter(News.is_private != True)
+    return render_template('blog.html', title='Новости', news=news)
+
 #Статический контент в папке static
 # Все изображения static/images
 #Таблицы стилей static/css
@@ -228,15 +292,18 @@ def form_sample():
 
 if __name__ == '__main__':
     db_session.global_init('db/blogs.db')
-    db_sess = db_session.create_session()
+    app.run(port=5000, host='127.0.0.1')
+
+
+  #  db_sess = db_session.create_session()
 #News create
-    #news = News(title="Первая новость", content="Первая новость", user_id = 1, is_private = False)
-    #db_sess.add(news)
-    #db_sess.commit()
+   # news = News(title="Срочная новость", content="срочная новость", user_id = 1, is_private = False)
+   # db_sess.add(news)
+   # db_sess.commit()
 
 #Read news
-    news=db_sess.query(News).filter(News.user_id==1).first()
-    print(news.title, news.content)
+   # news=db_sess.query(News).filter(News.user_id==1).first()
+   # print(news.title, news.content)
     #Read user
    # result = db_sess.query(User).first() только первая запись из запроса
    # result = db_sess.query(User).all()
@@ -252,13 +319,13 @@ if __name__ == '__main__':
    # print(result.email)
 
     #Create user
-   # user=User()
-  #  user.name='User4'
-  #  user.about='четвертый пользователь нашей БД'
-  #  user.email='email4@email.ru'
+  #  user=User()
+  #  user.name='User2'
+  #  user.about='второй пользователь нашей БД'
+  #  user.email='email2@email.ru'
   #  db_sess= db_session.create_session()
-   # db_sess.add(user)
-   # db_sess.commit()
+  #  db_sess.add(user)
+  #  db_sess.commit()
 
     #Delete user
    # db_sess.query(User).filter(User.id > 1).delete()
