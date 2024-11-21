@@ -13,11 +13,12 @@
               Автор:{{ item.user.name }}
               Дата новости:{{ item.created_date.strftime('%d.%m.%Y в %H:%M') }}
             </div><br>
-        {% if current_user.is_authenticated and current_user == item.user %}
+            {% if current_user.is_authenticated and current_user == item.user %}
             <div>
                 <a class="btn btn-primary btn-sm" href="/blog/{{ item.id }}">Изменить</a>&nbsp;
-                <a class="btn btn-primary btn-sm" href="/news_delete/{{ item.id }}">Удалить</a>
-            </div>
+                <a class="btn btn-primary btn-sm" href="/news_delete/{{ item.id }}"
+                onclick="return confirm('Вы действительно хотите удалить новость с заголовком {{ item.title }}?')">Удалить</a>
+            </div><br>
         {% endif %}
 </div><br>
     {% endfor %}

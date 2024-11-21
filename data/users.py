@@ -2,6 +2,7 @@
 import datetime
 import sqlalchemy
 from flask_login import UserMixin
+from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,10 +12,10 @@ ACCESS = {
     'admin': 2
 }
 
-news = orm.relationship("News", back_populates='user')
 
 
-class User(SqlAlchemyBase, UserMixin):
+
+class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -23,6 +24,8 @@ class User(SqlAlchemyBase, UserMixin):
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
+    news = orm.relationship("News", back_populates='user')
+   #level=sqlalchemy.Column(sqlalchemy.Integer, default=1)
 
     def __repr__(self):
         return f'<Объект user, Пользователь {self.name}>'
@@ -35,3 +38,15 @@ class User(SqlAlchemyBase, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def get_id(self):
+        return self.id
+"""
+Является ли текущий пользователь админом
+def is_admin(self):
+    return self.level == ACCESS['admin']
+Разрешен ли доступ пользователя с текущим уровнем
+def is_allowed(self, access_level):
+    return self.level >= access_level    
+    
+"""

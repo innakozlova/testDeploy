@@ -1,11 +1,12 @@
 # Новости нашего сайта
 import datetime
 import sqlalchemy
+from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
 
 
-class News(SqlAlchemyBase):
+class News(SqlAlchemyBase, SerializerMixin):
     __tablename__='news'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -17,4 +18,4 @@ class News(SqlAlchemyBase):
     user = orm.relationship('User')
 
     def __repr__(self):
-        return f'<Объект user, Пользователь {self.name}>'
+        return f'<Объект new, Новость {self.id}>'

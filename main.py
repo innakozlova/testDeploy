@@ -1,6 +1,6 @@
 import datetime
 import configparser
-from flask import Flask, url_for, request, render_template, make_response, session, abort
+from flask import Flask, url_for, request, render_template, make_response, session, abort, jsonify
 from flask import redirect, flash
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_login import current_user
@@ -13,6 +13,7 @@ from data import db_session
 from data.users import User
 from data.news import News
 from forms.add_news import NewsForm
+import news_api
 
 import requests
 from forms.user import RegisterForm
@@ -36,6 +37,10 @@ config = configparser.ConfigParser()  # объект для обращения �
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENTIONS
 
+
+@app.errorhandler(400)
+def http_400_handler(_):
+    return make_response(jsonify({'error': 'Новость не найдена'}), 400)
 #обработка ошибки сервера 401
 #пользователь не авторизован для просмотра данной страницы
 @app.errorhandler(401)
@@ -44,7 +49,9 @@ def http_401_handler(error):
 
 @app.errorhandler(404)
 def http_404_handler(error):
-    return render_template('error404.html', title='Страница не найдена')
+    return make_response(jsonify({'error': 'Новость не найдена'}), 404)
+# def http_404_handler(error):
+#    return render_template('error404.html', title='Страница не найдена')
 
 @app.route('/')
 @app.route('/index')
@@ -69,6 +76,7 @@ def user_loader(user_id):
 def session_test():
     visit_count=session.get('visit_count', 0)
     session['visit_count']=visit_count+1
+    #visit_count % 3 - 0,1,2  номер новости или контента в зависимости от visit count
     #session.pop('visit_count', None) # если надо программно уничтожить сессию
     return make_response(f'Вы посетили данную страницу {visit_count} раз')
 
@@ -109,6 +117,12 @@ def weather():
         params['humid'] = temp['humidity']
 
         return render_template('weather.html', title=f'Погода в {city}', form=request.form, params=params)
+
+#тестируем наш API
+@app.route('/apitest')
+def api_test():
+    res = requests.get('http://127.0.0.1:5000/api/news').json()
+    return render_template('apitest.html', title='Тестируем наш первый API', news=res['news'])
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -305,6 +319,8 @@ def aboutus():
 
 @app.route('/blog')
 def blog():
+    #if current_user.is_admin()
+    #else Доступа нет
     db_sess = db_session.create_session()
     news = db_sess.query(News).filter(News.is_private != True)
     return render_template('blog.html', title='Новости', news=news)
@@ -374,6 +390,8 @@ def form_sample():
 
 if __name__ == '__main__':
     db_session.global_init('db/blogs.db')
+    # прописываем blueprint в основное приложение
+    app.register_blueprint(news_api.blueprint)
     app.run(port=5000, host='127.0.0.1')
 
 
