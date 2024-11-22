@@ -1,3 +1,12 @@
+
+
+# для отслеживания состоянии структуры таблиц БД нам потребуется pip install alembic
+# в папке alembic сделать настройки env
+#alembic init alembic - создает директорию в корне проекта
+#Конфигурируем alembic.ini путь к БД после sqlalchemy.url
+#в терминале alembic revision __autogenerate -m "added level for user"
+#в терминале alembic upgrade head
+
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.orm import Session

@@ -23,9 +23,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    level = sqlalchemy.Column(sqlalchemy.Integer, default=1)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
     news = orm.relationship("News", back_populates='user')
-   #level=sqlalchemy.Column(sqlalchemy.Integer, default=1)
+
 
     def __repr__(self):
         return f'<Объект user, Пользователь {self.name}>'

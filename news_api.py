@@ -43,7 +43,7 @@ def create_news():
         user_id=request.json['user_id'],
         is_private=request.json['is_private']
     )
-    db_sess.add()
+    db_sess.add(news)
     db_sess.commit()
     return jsonify({'id': news.id})
 
@@ -59,3 +59,16 @@ def get_one_news(news_id):
             }
         )
     return make_response(jsonify({'error': 'Новость не найдена'}), 404)
+
+#удаление новости
+@blueprint.route('/api/news/<int:news_id>', methods=['DELETE'])
+def delete_news(news_id):
+    db_sess = db_session.create_session()
+    news = db_sess.query(News).get(news_id)
+    if not news:
+       return make_response(jsonify({'error': 'Новость не найдена'}), 404)
+    db_sess.delete(news)
+    db_sess.commit()
+    return jsonify({'success': f'Новость {news.id} удалена'})
+
+
