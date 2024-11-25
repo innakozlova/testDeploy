@@ -42,6 +42,13 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def get_id(self):
         return self.id
+
+    def is_admin(self):
+        return self.level == ACCESS['admin']
+
+    def is_allowed(self, access_level):
+        return self.level >= access_level
+
 """
 Является ли текущий пользователь админом
 def is_admin(self):
