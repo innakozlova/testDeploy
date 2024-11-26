@@ -20,6 +20,7 @@ from flask_restful import Api
 
 import requests
 from forms.user import RegisterForm
+from telegram_sender import send_to_telegram
 
 
 MS1 = 'http://127.0.0.1:5000/api/news'
@@ -355,7 +356,7 @@ def contacts():
         send_mail('pochtovy@rambler.ru', 'Запрос сайта', text_to_user)
         send_mail('inkys@yandex.ru', 'Запрос сайта', text)
 
-
+        send_to_telegram(text)
         return render_template('mailresult.html', title='Ваши данные', params=params)
 
     return render_template('contacts.html', title='Наши контакты', form=form)
